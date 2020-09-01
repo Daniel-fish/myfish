@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/cart.css"/>
+</head>
+<body>
+<div id="container">
+    <!-- ͷ��-->
+    <%- include('./header.html')%>
+    <!-- ����-->
+    <div id="">
+        <div id="contentTop">
+            <div id="wenzi1">
+                LITTLE BAG
+            </div>
+            <div id="wenzi2">
+              购物车
+            </div>
+        </div>
+        <div id="cartProduct">
+            <table>
+            <thead>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td></td>
+                    <td>商品名</td>
+                    <td>数量</td>
+                    <td>价格</td>
+                    <td>小计</td>
+                    <td>删除</td>
+                </tr>
+            </thead>
+            <tbody id="tbproduct">
+                 <% for(var i=0;i<productList.length;i++){ %>
+                    <tr>
+                        <td><input type="checkbox" data-sid="<%= productList[i].sid%>"></td>
+                        <td><img src="<%= productList[i].feng%>" alt=""></td>
+                        <td><%= productList[i].title%></td>
+                        <td><%= productList[i].num%></td>
+                        <td><%= productList[i].price%></td>
+                        <td class="sub"><%= productList[i].num*productList[i].price%></td>
+                        <td><span class="del" data-rid="<%= productList[i].rid%>">删除</span></td>
+                    </tr>
+               <%}%>
+            </tbody>
+        </table>
+        </div>
+        <hr/>
+        <div id="contentBottom">
+            <div id="contentBottomOne">
+               总计$ <span id="spantotal">0</span> 
+            </div>
+            <div id="contentBottomTwo">
+              结算
+            </div>
+        </div>
+    </div>
+    <%- include('./footer.html')%>
+    </div>
+</div>
+<script type="text/javascript" src="js/javascript.js"></script>
+<script src="js/jquery.3.4.0.js"></script>
+<script type="text/javascript">
+        $('#tbproduct').on('click','input[type="checkbox"]',function(){
+            var checked=$(this).prop('checked');
+            var total=Number($('#spantotal').text());
+            var sub=Number($(this).parent().parent().find('.sub').text())
+            if(checked){
+                total+=sub;
+            }else{
+                total-=sub;
+            }
+            $('#spantotal').text(total)
+        })
+
+        $('#contentBottomTwo').click(function(){
+            var checkedall=$('#tbproduct input[type="checkbox"]:checked');
+            var sid=[];
+            for(var i=0;i<checkedall.length;i++){
+                sid.push($(checkedall[i]).attr('data-sid')) ;
+
+            }
+        var sidstr=sid.join(',');
+            $.ajax({
+                type: "post",
+                url: "/buildOrder",
+                data: "sidstr="+sidstr+'&total='+$('#spantotal').text(),
+                success: function (data) {
+                    alert(data.message)
+                }
+            });
+        })
+</script>
+</body>
+</html>
